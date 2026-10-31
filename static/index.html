@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a1220">
+  <meta name="description" content="GridLens: explore hourly energy use and test a simple day-ahead demand forecast. A software engineering portfolio project by Washim Akram.">
+  <title>GridLens — Energy demand, made clearer</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script defer src="/static/vendor/plotly.min.js"></script>
+  <script defer src="/static/app.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="GridLens home">
+        <span class="brand-symbol"><svg width="25" height="25" viewBox="0 0 25 25" fill="none" aria-hidden="true"><path d="M2 16h5l3-9 5 13 3-7h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="brand-text">grid<span>lens</span><small>ENERGY ANALYTICS LAB</small></span>
+      </a>
+
+      <div class="side-section-label">WORKSPACE</div>
+      <nav class="nav-links" aria-label="Application sections">
+        <a href="#overview" class="nav-link active"><span>◫</span> Overview</a>
+        <a href="#patterns" class="nav-link"><span>⌁</span> Consumption patterns</a>
+        <a href="#forecast" class="nav-link"><span>◷</span> Forecast studio</a>
+        <a href="#method" class="nav-link"><span>≋</span> Behind the model</a>
+      </nav>
+
+      <div class="sidebar-divider"></div>
+      <div class="side-section-label">DATA SOURCE</div>
+      <label class="field-label" for="dataset-select">Active dataset</label>
+      <select id="dataset-select" aria-label="Select dataset"><option value="demo">Generated demo facility</option></select>
+      <div class="source-description"><span class="glow-dot"></span><span id="source-state">Loading demo data…</span></div>
+      <label for="csv-upload" class="upload-target" id="upload-target"><span class="upload-icon">↑</span><strong>Upload your own CSV</strong><small>Hourly readings · max 4 MB</small></label>
+      <input id="csv-upload" type="file" accept=".csv,text/csv" class="visually-hidden">
+      <a id="sample-csv-link" class="small-link" href="/api/example-csv">Download example CSV <span aria-hidden="true">↗</span></a>
+      <div id="upload-message" class="upload-message" role="status" aria-live="polite"></div>
+
+      <div class="sidebar-bottom">
+        <div class="mini-card"><span class="mini-card-icon">⌘</span><div><strong>Open to inspect</strong><p>No black box. See the model, assumptions, and limitations in the repo.</p></div></div>
+        <a class="profile-mini" href="https://akramswe.github.io/" target="_blank" rel="noopener noreferrer"><span class="avatar">WA</span><span><strong>Washim Akram</strong><small>Software Engineer · Vienna</small></span><span class="profile-arrow">↗</span></a>
+      </div>
+    </aside>
+
+    <main class="main" id="overview">
+      <header class="topbar"><div class="breadcrumb">Portfolio project <span>/</span> Energy analytics</div><div class="top-right"><span class="status"><span class="status-dot"></span> Demo workspace</span><a href="https://github.com/akramswe" target="_blank" rel="noopener noreferrer" class="top-profile">GitHub ↗</a></div></header>
+      <div class="content">
+        <section class="hero">
+          <div class="hero-copy"><div class="eyebrow"><span class="eyebrow-line"></span> ENERGY INTELLIGENCE / 01</div><h1>Understand the load.<br><em>See what comes next.</em></h1><p>Explore electricity consumption, spot the patterns behind demand, and test a transparent 24-hour forecasting model.</p><div class="hero-actions"><a class="primary-link" href="#forecast">Explore the forecast <span>↗</span></a><a class="secondary-link" href="/api/export?dataset_id=demo" id="export-link">Export to Power BI <span>↘</span></a></div></div>
+          <div class="hero-art" aria-hidden="true"><div class="orb orb-one"></div><div class="orb orb-two"></div><svg viewBox="0 0 450 250" preserveAspectRatio="xMidYMid meet"><defs><linearGradient id="wavelight" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#45d0b5" stop-opacity=".05"/><stop offset=".52" stop-color="#54e5c3" stop-opacity=".97"/><stop offset="1" stop-color="#b7fbde" stop-opacity=".5"/></linearGradient></defs><path d="M0 170L50 170L80 150L110 184L142 90L170 190L205 125L232 143L267 80L295 158L333 134L356 40L380 132L411 101L450 108" fill="none" stroke="url(#wavelight)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M0 170L50 170L80 150L110 184L142 90L170 190L205 125L232 143L267 80L295 158L333 134L356 40L380 132L411 101L450 108" fill="none" stroke="#60ebce" opacity=".12" stroke-width="20" stroke-linecap="round"/><circle cx="356" cy="40" r="7" fill="#66e9ca"/><circle cx="356" cy="40" r="18" fill="#66e9ca" opacity=".12"/></svg><span class="art-caption">SIGNAL / NOT NOISE</span></div>
+        </section>
+
+        <div class="section-heading"><div><div class="eyebrow dark"><span class="eyebrow-line"></span> AT A GLANCE</div><h2>Energy overview</h2></div><div class="chip" id="date-range">Loading date range…</div></div>
+        <div class="metrics">
+          <article class="metric-card"><div class="metric-top"><span>Total consumption</span><span class="metric-icon">◈</span></div><div class="metric-value" id="metric-total">— <small>MWh</small></div><div class="metric-caption">Energy across the full dataset</div><div class="metric-spark" id="spark-1"></div></article>
+          <article class="metric-card"><div class="metric-top"><span>Average hourly load</span><span class="metric-icon">⌁</span></div><div class="metric-value" id="metric-avg">— <small>kW</small></div><div class="metric-caption">Mean energy per hour</div><div class="metric-spark" id="spark-2"></div></article>
+          <article class="metric-card"><div class="metric-top"><span>Highest hourly load</span><span class="metric-icon">↗</span></div><div class="metric-value" id="metric-peak">— <small>kW</small></div><div class="metric-caption" id="peak-caption">Peak observed hour</div><div class="metric-spark" id="spark-3"></div></article>
+        </div>
+
+        <section class="panel main-chart-panel"><div class="panel-header"><div><div class="small-heading">DEMAND TRACKER</div><h3>Consumption over time</h3><p>Daily energy use, summed from hourly readings.</p></div><div class="range-picker" role="group" aria-label="Chart time range"><button class="range active" data-days="14">14D</button><button class="range" data-days="30">30D</button><button class="range" data-days="90">90D</button></div></div><div id="trend-chart" class="chart" aria-label="Daily energy consumption trend chart"></div><div class="chart-footer"><span><span class="legend-dot teal"></span> Daily consumption</span><span id="daily-average">—</span></div></section>
+
+        <section id="patterns" class="patterns"><div class="section-heading tight"><div><div class="eyebrow dark"><span class="eyebrow-line"></span> WHEN ENERGY IS USED</div><h2>Consumption patterns</h2></div><p class="section-sidecopy">The small habits in the data often explain the big peaks.</p></div><div class="two-columns"><article class="panel pattern-panel"><div class="panel-header"><div><div class="small-heading">HOURLY PROFILE</div><h3>A typical day</h3><p>Average load by hour of day</p></div><span class="round-icon">◷</span></div><div id="hour-chart" class="chart-small" aria-label="Average load by hour"></div></article><article class="panel pattern-panel"><div class="panel-header"><div><div class="small-heading">WEEKLY PROFILE</div><h3>Across the week</h3><p>Average load by day of week</p></div><span class="round-icon">▥</span></div><div id="weekday-chart" class="chart-small" aria-label="Average load by weekday"></div></article></div></section>
+
+        <section id="forecast" class="forecast-section"><div class="section-heading"><div><div class="eyebrow dark"><span class="eyebrow-line"></span> MACHINE LEARNING / 02</div><h2>Forecast studio</h2></div><span class="chip accent">24-HOUR AHEAD</span></div><div class="panel forecast-panel"><div class="forecast-toolbar"><div><h3>What might tomorrow look like?</h3><p>Train a model on historical observations and compare it against a simple yesterday-as-tomorrow baseline.</p></div><div class="forecast-controls"><label class="visually-hidden" for="model-select">Forecast model</label><select id="model-select"><option value="ridge">Ridge regression</option><option value="forest">Random forest</option></select><button class="run-button" id="run-forecast"><span>✦</span> Run forecast</button></div></div><div class="forecast-stats" id="forecast-stats"><div class="placeholder-stat"><div class="placeholder-icon">↗</div><strong>Choose a model and run it</strong><p>You'll see the next 24 hourly estimates and how the model performed on unseen historical data.</p></div></div><div class="forecast-plot" id="forecast-chart" aria-label="Historical and forecast energy consumption chart"></div><div class="forecast-caption" id="forecast-note">Forecasts are estimates, not measured values. Nothing here is a live utility feed.</div><div class="forecast-footer"><span><span class="legend-dot teal"></span> Observed <span class="legend-dot blue spaced"></span> Estimated</span><button id="forecast-download" class="text-button" disabled>Download forecast CSV ↓</button></div></div></section>
+
+        <section id="method" class="method-section"><div class="section-heading tight"><div><div class="eyebrow dark"><span class="eyebrow-line"></span> THE THINKING BEHIND IT</div><h2>Simple enough to question.</h2></div></div><div class="method-grid"><article class="method-card"><span class="method-number">01 / INPUT</span><h4>Start with honest data</h4><p>The built-in facility readings are <strong>generated examples</strong>. Upload your own continuous hourly CSV to work with measured values. No numbers are presented as real grid readings.</p></article><article class="method-card"><span class="method-number">02 / TRAINING</span><h4>Respect the timeline</h4><p>The model sees earlier hours, never future demand. The most recent input for each target hour comes from at least 24 hours earlier. The final block is held back for evaluation.</p></article><article class="method-card"><span class="method-number">03 / REALITY CHECK</span><h4>Keep the benchmark</h4><p>A more complex model is not always better. We compare error with a seasonal-naive forecast and show when our model performs worse, not just when it wins.</p></article></div><div class="method-note"><span>↗</span><p><strong>Try real measurements:</strong> The repository includes a converter for the UCI Individual Household Electric Power Consumption dataset. It also explains why household readings are not a proxy for grid demand.</p><a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener noreferrer">Dataset source ↗</a></div></section>
+
+        <footer class="footer"><div><span class="footer-brand">gridlens<span>.</span></span><p>Built with care and a healthy amount of skepticism about predictions.</p></div><div class="footer-links"><span>Made by <a href="https://akramswe.github.io/" target="_blank" rel="noopener noreferrer">Washim Akram</a></span><a href="mailto:akram116223@gmail.com">Email ↗</a><a href="https://github.com/akramswe" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></footer>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+</body>
+</html>

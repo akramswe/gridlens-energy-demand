@@ -1,0 +1,19 @@
+# Local Python environments
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.env
+
+# Large external / real consumption datasets (do not publish by accident)
+data/uci_*.csv
+data/*private*.csv
+uploads/
+*.log
+.DS_Store
+.idea/
+.vscode/

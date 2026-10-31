@@ -1,0 +1,7 @@
+{
+  "name": "GridLens midnight",
+  "dataColors": ["#61DEC1", "#94AAFF", "#F0B87A", "#73B7DA", "#C692DB", "#92C1B9"],
+  "background": "#101C29",
+  "foreground": "#EAF3F5",
+  "tableAccent": "#61DEC1"
+}
